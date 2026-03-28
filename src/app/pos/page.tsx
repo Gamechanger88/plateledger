@@ -433,32 +433,39 @@ export default function POSPage() {
           <title>POS Receipt</title>
           <style>
             @page { margin: 0; }
-            body { 
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-              width: 80mm; 
-              padding: 5mm; 
+            * { box-sizing: border-box; }
+            body {
+              font-family: "Courier New", Courier, monospace;
+              width: 80mm;
+              padding: 4mm 3mm;
               margin: 0;
-              font-size: 13px;
-              line-height: 1.6;
+              font-size: 11px;
+              line-height: 1.35;
               color: #000;
             }
             .text-center { text-align: center; }
             .text-right { text-align: right; }
             .font-bold { font-weight: bold; }
-            .divider { border-bottom: 1px dashed #000; margin: 12px 0; }
+            .divider { border: none; border-bottom: 1px dashed #000; margin: 5px 0; }
             .section-divider { page-break-after: always; break-after: page; margin: 0; padding: 0; border: none; }
             table { width: 100%; border-collapse: collapse; margin: 0; }
-            th { text-align: left; padding: 8px 0; font-weight: bold; }
-            td { padding: 6px 0; vertical-align: top; }
-            .item-col { width: 40%; text-align: left; }
-            .qty-col { width: 12%; text-align: right; }
-            .price-col { width: 24%; text-align: right; }
-            .amt-col { width: 24%; text-align: right; }
-            .total-row { font-size: 16px; font-weight: bold; padding: 10px 0; }
-            .token-header { font-size: 20px; font-weight: bold; border: 2px solid #000; padding: 10px; display: inline-block; margin-bottom: 20px; }
-            .kitchen-item { font-size: 15px; font-weight: bold; }
-            .metadata-row { display: flex; justify-content: space-between; margin: 15px 0; }
-            .tax-row td { padding: 3px 0; text-align: right; }
+            th { text-align: left; padding: 3px 0; font-weight: bold; font-size: 11px; border-bottom: 1px dashed #000; }
+            th.right { text-align: right; }
+            td { padding: 2px 0; vertical-align: top; font-size: 11px; }
+            .item-col { width: 46%; text-align: left; word-break: break-word; }
+            .qty-col  { width: 10%; text-align: center; }
+            .price-col{ width: 22%; text-align: right; }
+            .amt-col  { width: 22%; text-align: right; }
+            .subtotal-label { font-weight: bold; width: 46%; }
+            .subtotal-qty   { width: 10%; text-align: center; font-weight: bold; }
+            .subtotal-amt   { width: 44%; text-align: right; font-weight: bold; }
+            .tax-label { width: 72%; text-align: left; }
+            .tax-amt   { width: 28%; text-align: right; }
+            .total-row { font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; padding: 5px 0; }
+            .token-header { font-size: 15px; font-weight: bold; border: 2px solid #000; padding: 5px 10px; display: inline-block; margin-bottom: 8px; }
+            .kitchen-item-name { font-size: 12px; font-weight: bold; word-break: break-word; }
+            .kitchen-item-qty  { font-size: 16px; font-weight: bold; text-align: center; }
+            .meta-row { display: flex; justify-content: space-between; align-items: flex-start; margin: 6px 0; }
           </style>
         </head>
         <body onload="window.print();window.close()">
@@ -966,27 +973,33 @@ export default function POSPage() {
       <div className="hidden">
         <div ref={printRef} className="receipt-view">
           <div className="customer-invoice">
-            <div className="text-center">
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 8px 0' }}>{restaurant.name}</h2>
-              {restaurant.address && <div style={{ margin: '0' }}>{restaurant.address}</div>}
-              {restaurant.mobileNumber && <div style={{ margin: '4px 0' }}>PHONE : {restaurant.mobileNumber}</div>}
-              {restaurant.gstNumber && <div style={{ margin: '0' }}>GSTIN : {restaurant.gstNumber}</div>}
-            </div>
-            <div className="metadata-row">
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span className="font-bold">Bill No : {lastBillId}</span>
-                <span style={{ fontSize: '10px' }}>Daily Sr : {activeSession?.dailySrNo}</span>
-              </div>
-              <span>Date : {mounted ? format(new Date(), 'dd/MM/yyyy') : ''}</span>
+            {/* Header */}
+            <div className="text-center" style={{ marginBottom: '6px' }}>
+              <div style={{ fontSize: '15px', fontWeight: 'bold', marginBottom: '2px' }}>{restaurant.name}</div>
+              {restaurant.address && <div style={{ fontSize: '10px' }}>{restaurant.address}</div>}
+              {restaurant.mobileNumber && <div style={{ fontSize: '10px' }}>Ph: {restaurant.mobileNumber}</div>}
+              {restaurant.gstNumber && <div style={{ fontSize: '10px' }}>GSTIN: {restaurant.gstNumber}</div>}
             </div>
             <div className="divider"></div>
+            {/* Bill meta */}
+            <div className="meta-row">
+              <span className="font-bold">Bill# {lastBillId}</span>
+              <span>{mounted ? format(new Date(), 'dd/MM/yy HH:mm') : ''}</span>
+            </div>
+            <div className="meta-row">
+              <span>Sr No: {activeSession?.dailySrNo}</span>
+            </div>
+            <div className="divider"></div>
+            {/* Items table */}
             <table>
               <thead>
-                <tr><th className="item-col">Item</th><th className="qty-col">Qty</th><th className="price-col">Price</th><th className="amt-col">Amt</th></tr>
+                <tr>
+                  <th className="item-col">Item</th>
+                  <th className="qty-col">Qty</th>
+                  <th className="price-col">Rate</th>
+                  <th className="amt-col">Amt</th>
+                </tr>
               </thead>
-            </table>
-            <div className="divider"></div>
-            <table>
               <tbody>
                 {activeSession?.cart.map((item, idx) => (
                   <tr key={`${item.itemId}-${idx}`}>
@@ -999,53 +1012,65 @@ export default function POSPage() {
               </tbody>
             </table>
             <div className="divider"></div>
+            {/* Subtotal */}
             <table>
               <tbody>
                 <tr>
-                  <td className="font-bold">SubTotal</td>
-                  <td className="qty-col font-bold" style={{ width: '12%' }}>{calculations.itemCount}</td>
-                  <td className="text-right font-bold" style={{ width: '48%' }}>{calculations.subtotal.toFixed(2)}</td>
+                  <td className="subtotal-label">Sub Total</td>
+                  <td className="subtotal-qty">{calculations.itemCount}</td>
+                  <td className="subtotal-amt">{calculations.subtotal.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+            {/* Tax */}
+            <table>
+              <tbody>
+                <tr>
+                  <td className="tax-label">CGST @ 2.50%</td>
+                  <td className="tax-amt">{calculations.cgst.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td className="tax-label">SGST @ 2.50%</td>
+                  <td className="tax-amt">{calculations.sgst.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
             <div className="divider"></div>
-            <table className="tax-row">
-              <tbody>
-                <tr><td>CGST @ 2.50%</td><td style={{ width: '24%' }}>{calculations.cgst.toFixed(2)}</td></tr>
-                <tr><td>SGST @ 2.50%</td><td style={{ width: '24%' }}>{calculations.sgst.toFixed(2)}</td></tr>
-              </tbody>
-            </table>
-            <div className="divider"></div>
-            <div className="total-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ textTransform: 'uppercase' }}>TOTAL</span>
+            {/* Total */}
+            <div className="total-row">
+              <span>TOTAL</span>
               <span>Rs. {calculations.total.toFixed(2)}</span>
             </div>
             <div className="divider"></div>
-            <div className="text-right" style={{ margin: '15px 0', fontSize: '11px' }}>E & O.E</div>
-            <div className="text-center" style={{ marginTop: '20px' }}>Thank You</div>
+            <div className="text-center" style={{ marginTop: '8px', fontSize: '10px' }}>Thank You! Visit Again</div>
+            <div className="text-right" style={{ fontSize: '9px', marginTop: '4px' }}>E &amp; O.E</div>
           </div>
           <div className="section-divider"></div>
           <div className="kitchen-token">
             <div className="text-center">
               <div className="token-header">FOOD TOKEN</div>
-              <p style={{ fontSize: '15px', fontWeight: 'bold', margin: '8px 0' }}>Daily Sr : {activeSession?.dailySrNo}</p>
-              <p style={{ margin: '0' }}>{mounted ? format(new Date(), 'dd/MM/yyyy HH:mm') : ''}</p>
+              <div style={{ fontSize: '13px', fontWeight: 'bold', margin: '4px 0 2px' }}>Sr# {activeSession?.dailySrNo}</div>
+              <div style={{ fontSize: '10px' }}>{mounted ? format(new Date(), 'dd/MM/yy HH:mm') : ''}</div>
             </div>
             <div className="divider"></div>
-            <table><thead><tr><th style={{ fontSize: '15px', width: '80%', textAlign: 'left' }}>Item Description</th><th style={{ fontSize: '15px', width: '20%', textAlign: 'center' }}>Qty</th></tr></thead></table>
-            <div className="divider"></div>
             <table>
+              <thead>
+                <tr>
+                  <th style={{ width: '80%', textAlign: 'left', fontSize: '13px' }}>Item</th>
+                  <th style={{ width: '20%', textAlign: 'center', fontSize: '13px' }}>Qty</th>
+                </tr>
+              </thead>
               <tbody>
                 {activeSession?.cart.map((item, idx) => (
                   <tr key={`token-${item.itemId}-${idx}`}>
-                    <td className="kitchen-item" style={{ padding: '10px 0', width: '80%' }}>{item.name}</td>
-                    <td className="kitchen-item" style={{ textAlign: 'center', fontSize: '20px', padding: '10px 0', width: '20%' }}>{item.quantity}</td>
+                    <td className="kitchen-item-name" style={{ width: '80%', paddingTop: '8px', paddingBottom: '8px' }}>{item.name}</td>
+                    <td className="kitchen-item-qty" style={{ width: '20%', paddingTop: '8px', paddingBottom: '8px' }}>{item.quantity}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div className="divider"></div>
-            <div className="text-center font-bold" style={{ marginTop: '20px', fontSize: '15px' }}>** KITCHEN COPY **</div>
+            <div className="text-center font-bold" style={{ marginTop: '12px', fontSize: '13px' }}>** KITCHEN COPY **</div>
           </div>
         </div>
       </div>
