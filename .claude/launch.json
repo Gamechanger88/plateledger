@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Next.js Dev (Turbopack)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "--turbopack"],
+      "port": 9002,
+      "autoPort": true
+    },
+    {
+      "name": "Genkit AI Dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "genkit:dev"],
+      "port": 4000
+    },
+    {
+      "name": "Genkit AI Watch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "genkit:watch"],
+      "port": 4000
+    }
+  ]
+}

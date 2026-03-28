@@ -1,0 +1,186 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * CORE PHILOSOPHY
+     * This ruleset enforces a multi-tenant security model where all data is strictly scoped
+     * under a unique /restaurants/{restaurantId} path. Access is granted based on verified 
+     * membership within that specific restaurant's context.
+     */
+
+    // --- Helper Functions ---
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** 
+     * @description Verifies if the user is a member by checking the 'members' field on the restaurant document.
+     * Uses get() to verify membership even if the request is for a sub-collection.
+     */
+    function isMember(restaurantId) {
+      return isSignedIn() && 
+        get(/databases/$(database)/documents/restaurants/$(restaurantId)).data.members[request.auth.uid] != null;
+    }
+
+    function isExistingMember(restaurantId) {
+      return isMember(restaurantId) && resource != null;
+    }
+
+    function matchesPathId(docId) {
+      return request.resource.data.id == docId;
+    }
+
+    function idIsImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    // --- Restaurant Core Rules ---
+
+    match /restaurants/{restaurantId} {
+      // Allow any signed-in user to find their restaurant via query (list) or read details (get)
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn();
+      // Only existing members can update the restaurant settings/members
+      allow update: if isMember(restaurantId);
+    }
+
+    // --- Sub-collection Rules ---
+    // All sub-collections follow the same membership logic: 
+    // - Read (get/list) allowed for members.
+    // - Create/Update/Delete allowed for members with data integrity checks.
+
+    match /restaurants/{restaurantId}/restaurantProfiles/{profileId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(profileId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/salesAccounts/{accountId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(accountId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    // Legacy/Alias support for accounts
+    match /restaurants/{restaurantId}/accounts/{accountId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(accountId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/posMethods/{methodId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(methodId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/menuItems/{itemId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(itemId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/orders/{orderId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(orderId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/salePayments/{paymentId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(paymentId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/expenses/{expenseId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(expenseId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/parties/{partyId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(partyId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/staff/{staffId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(staffId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/transfers/{transferId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(transferId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/monthlyBalances/{balanceId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(balanceId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/dayStatuses/{dayId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(dayId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/expenseCategories/{catId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(catId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/dailyRevenueRecords/{recId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(recId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/dailySummaries/{sumId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(sumId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/importJobs/{jobId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(jobId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/dailyPhysicalBalances/{docId} {
+      allow read: if isMember(restaurantId);
+      allow create: if isMember(restaurantId) && matchesPathId(docId);
+      allow update: if isMember(restaurantId) && idIsImmutable();
+      allow delete: if isMember(restaurantId);
+    }
+
+    match /restaurants/{restaurantId}/members/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isMember(restaurantId));
+      allow write: if false;
+    }
+  }
+}

@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 80 20% 94%; /* #ECF2EE */
+    --foreground: 120 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 120 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 10% 10%;
+    --primary: 152 29% 56%; /* #6FB08F */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 152 20% 90%;
+    --secondary-foreground: 152 30% 20%;
+    --muted: 152 10% 88%;
+    --muted-foreground: 152 10% 40%;
+    --accent: 85 72% 37%; /* #68A11A */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 152 15% 85%;
+    --input: 152 15% 85%;
+    --ring: 152 29% 56%;
+    --radius: 0.75rem;
+    --chart-1: 152 29% 56%;
+    --chart-2: 85 72% 37%;
+    --chart-3: 35 90% 50%;
+    --chart-4: 190 70% 50%;
+    --chart-5: 280 60% 50%;
+
+    /* Sidebar Variables */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 152 10% 20%;
+    --sidebar-primary: 152 29% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 152 30% 92%; /* Slightly darker for better visibility */
+    --sidebar-accent-foreground: 152 50% 20%;
+    --sidebar-border: 152 15% 90%;
+    --sidebar-ring: 152 29% 56%;
+  }
+  .dark {
+    --background: 120 10% 5%;
+    --foreground: 120 5% 90%;
+    --card: 120 10% 8%;
+    --card-foreground: 120 5% 90%;
+    --popover: 120 10% 8%;
+    --popover-foreground: 120 5% 90%;
+    --primary: 152 29% 46%;
+    --primary-foreground: 152 10% 95%;
+    --secondary: 152 20% 15%;
+    --secondary-foreground: 152 30% 85%;
+    --muted: 152 10% 15%;
+    --muted-foreground: 152 10% 60%;
+    --accent: 85 72% 47%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 152 15% 20%;
+    --input: 152 15% 20%;
+    --ring: 152 29% 46%;
+
+    /* Dark Sidebar Variables */
+    --sidebar-background: 120 10% 8%;
+    --sidebar-foreground: 120 5% 90%;
+    --sidebar-primary: 152 29% 46%;
+    --sidebar-primary-foreground: 152 10% 95%;
+    --sidebar-accent: 152 20% 15%;
+    --sidebar-accent-foreground: 152 30% 85%;
+    --sidebar-border: 152 15% 20%;
+    --sidebar-ring: 152 29% 46%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
+  }
+}
+
+/* Tablet-friendly scaling: reduce base font for iPad/tablet range */
+@media (min-width: 768px) and (max-width: 1199px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

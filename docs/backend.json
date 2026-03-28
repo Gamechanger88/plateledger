@@ -1,0 +1,86 @@
+
+{
+  "entities": {
+    "RestaurantProfile": {
+      "title": "RestaurantProfile",
+      "description": "Stores business branding and details for receipts.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "mobileNumber": { "type": "string" },
+        "gstNumber": { "type": "string" }
+      }
+    },
+    "POSMethod": {
+      "title": "POSMethod",
+      "description": "Payment collection methods at the POS console (PhonePe, Cash, etc).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "linkedAccountId": { "type": "string" },
+        "isActive": { "type": "boolean" }
+      }
+    },
+    "Account": {
+      "title": "Account",
+      "type": "object",
+      "description": "Financial account used by the restaurant (Axis, Main Cash).",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "isActiveForBilling": { "type": "boolean" }
+      }
+    },
+    "SaleOrder": {
+      "title": "SaleOrder",
+      "type": "object",
+      "description": "POS bill record stored in staging before ledger settlement.",
+      "properties": {
+        "id": { "type": "string" },
+        "billNumber": { "type": "string" },
+        "total": { "type": "number" },
+        "posMethodId": { "type": "string" },
+        "isSettled": { "type": "boolean" }
+      }
+    },
+    "MenuItem": {
+      "title": "MenuItem",
+      "type": "object",
+      "description": "A food or drink item in the restaurant menu.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "sortOrder": { "type": "number" }
+      }
+    }
+  },
+  "auth": {
+    "providers": [
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "/restaurants/{restaurantId}/posMethods/{methodId}": {
+      "schema": "#/backend/entities/POSMethod",
+      "description": "Configured methods for POS collections."
+    },
+    "/restaurants/{restaurantId}/orders/{orderId}": {
+      "schema": "#/backend/entities/SaleOrder",
+      "description": "POS bills stored in staging."
+    },
+    "/restaurants/{restaurantId}/salesAccounts/{accountId}": {
+      "schema": "#/backend/entities/Account",
+      "description": "Financial ledger accounts."
+    },
+    "/restaurants/{restaurantId}/menuItems/{itemId}": {
+      "schema": "#/backend/entities/MenuItem",
+      "description": "Restaurant menu items."
+    }
+  }
+}
