@@ -64,7 +64,9 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(git rm:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(find /Users/ravikiranjadhav/StudioProjects/plateledger/src/components -type f -name *.tsx -o -name *.ts)",
+      "Bash(xargs ls:*)"
     ]
   },
   "enabledPlugins": {

@@ -1,7 +1,9 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const http = require('http');
+const fs = require('fs');
+const os = require('os');
 
 let mainWindow;
 let serverProcess;
@@ -21,6 +23,8 @@ function createWindow() {
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     }
   });
   
@@ -72,4 +76,30 @@ app.on('will-quit', () => {
 app.on('activate', function () {
   // Only create a new window if none exists and we're not already creating one
   if (mainWindow === null && !isCreatingWindow) createWindow();
+});
+
+// ESC/POS cash drawer pulse: ESC p 0 25 250
+ipcMain.handle('open-cash-drawer', async () => {
+  const drawerCmd = Buffer.from([0x1B, 0x70, 0x00, 0x19, 0xFA]);
+  const tmpPath = path.join(os.tmpdir(), `drawer_${Date.now()}.bin`);
+
+  return new Promise((resolve) => {
+    fs.writeFile(tmpPath, drawerCmd, (writeErr) => {
+      if (writeErr) {
+        resolve({ success: false, error: writeErr.message });
+        return;
+      }
+
+      // macOS/Linux: lpr -l sends raw bytes to the default printer
+      // Windows: copy /b to the printer port
+      const cmd = process.platform === 'win32'
+        ? `copy /b "${tmpPath}" LPT1`
+        : `lpr -l "${tmpPath}"`;
+
+      exec(cmd, (execErr) => {
+        fs.unlink(tmpPath, () => {});
+        resolve({ success: !execErr, error: execErr?.message });
+      });
+    });
+  });
 });

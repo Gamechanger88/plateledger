@@ -446,8 +446,7 @@ export default function POSPage() {
             .text-right { text-align: right; }
             .font-bold { font-weight: bold; }
             .divider { border-bottom: 1px dashed #000; margin: 12px 0; }
-            .section-divider { border-bottom: 2px dashed #000; margin: 30px 0; padding-bottom: 30px; position: relative; }
-            .section-divider::after { content: 'CUT HERE'; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 5px; font-size: 8px; font-weight: bold; color: #000; }
+            .section-divider { page-break-after: always; break-after: page; margin: 0; padding: 0; border: none; }
             table { width: 100%; border-collapse: collapse; margin: 0; }
             th { text-align: left; padding: 8px 0; font-weight: bold; }
             td { padding: 6px 0; vertical-align: top; }
@@ -525,6 +524,11 @@ export default function POSPage() {
 
     setLastBillId(billId);
     setShowBill(true);
+
+    // Open cash drawer via Electron IPC (no-op in browser)
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      (window as any).electronAPI.openCashDrawer();
+    }
 
     setTimeout(() => {
       handlePrint();
